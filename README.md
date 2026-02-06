@@ -1,4 +1,4 @@
-# bun-library
+# solana-mobile-seeker-genesis-holders
 
 This is a template for creating a modern TypeScript library or package using [Bun](https://bun.sh/). It comes pre-configured with essential tools for development, testing, linting, and publishing.
 
@@ -14,7 +14,7 @@ This is a template for creating a modern TypeScript library or package using [Bu
 
 ## Getting Started
 
-To use this template, you typically would use a scaffolding tool like `bunx create-something -t bun-library`.
+To use this template, you typically would use a scaffolding tool like `bunx create-something -t solana-mobile-seeker-genesis-holders`.
 
 ### Installation
 

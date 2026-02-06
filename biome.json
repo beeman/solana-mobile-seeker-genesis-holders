@@ -17,7 +17,8 @@
     }
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": ["**", "!data"]
   },
   "formatter": {
     "attributePosition": "auto",

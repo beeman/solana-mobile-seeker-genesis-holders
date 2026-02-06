@@ -4,6 +4,11 @@
   "workspaces": {
     "": {
       "name": "bun-library",
+      "dependencies": {
+        "@solana/kit": "^6.0.1",
+        "@solana/kit-plugin-rpc": "^0.2.0",
+        "superjson": "^2.2.6",
+      },
       "devDependencies": {
         "@biomejs/biome": "^2.3.11",
         "@changesets/cli": "^2.29.8",
@@ -232,6 +237,86 @@
 
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.55.2", "", { "os": "win32", "cpu": "x64" }, "sha512-xNO+fksQhsAckRtDSPWaMeT1uIM+JrDRXlerpnWNXhn1TdB3YZ6uKBMBTKP0eX9XtYEP978hHk1f8332i2AW8Q=="],
 
+    "@solana/accounts": ["@solana/accounts@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/rpc-spec": "6.0.1", "@solana/rpc-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-wdW2KI31jeAIyryL2hLytu+bmIbfKBPkO2Qsu7DO80m2pqOVVOGQ0L0wIqFdNXZN7Eu/FVTY8sh6gqF9bnf5LQ=="],
+
+    "@solana/addresses": ["@solana/addresses@6.0.1", "", { "dependencies": { "@solana/assertions": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/nominal-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-i/7JuTZF1MInCulP8/+aK9khKcDgjTrqqEl3wRmg6Kk/Dq+rOBrjXggLf3bEtGSWV53iH0NGDQt+psUNFd5Reg=="],
+
+    "@solana/assertions": ["@solana/assertions@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-Fnk0PCxjeNLDrsRQX+DRS3HnN5PRYQedosmtqx0/xK2CIB4lG/4coK/IdoL6i8/yS4EcKq8gNcMfH4fkmaMfLQ=="],
+
+    "@solana/codecs": ["@solana/codecs@6.0.1", "", { "dependencies": { "@solana/codecs-core": "6.0.1", "@solana/codecs-data-structures": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/options": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-xNL69WA50fCMItk3zXA7UMDHVMDyW9paL32wwxzL++sv7txfgma3UIAxP90tn9GBMwjPTB74hI6ook1mA2DhTQ=="],
+
+    "@solana/codecs-core": ["@solana/codecs-core@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-OnUQk94qfvfE0nVveZ638aNUL3tyRJoorUFiAG0ICTGUo3c6fkYb8vH23o/5O2qmuSmYND1sn+UCaldNMVkFpg=="],
+
+    "@solana/codecs-data-structures": ["@solana/codecs-data-structures@6.0.1", "", { "dependencies": { "@solana/codecs-core": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-ImPGi5wtpca0gLaD9dJGj29z6GMU8tCYjqnmTc5Lyh5S80iCz9wNlwT1/VvPM6gqeIOFVx8bM9H1iljQ7MuCMw=="],
+
+    "@solana/codecs-numbers": ["@solana/codecs-numbers@6.0.1", "", { "dependencies": { "@solana/codecs-core": "6.0.1", "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-ZrI1NjUsf4I+Klue/2rlQbZLcGRom/G2E4VB/8x4IEHGOeFLQhXcxmnib8kdgomQRYOzF1BjVDmCYxvZr+6AWA=="],
+
+    "@solana/codecs-strings": ["@solana/codecs-strings@6.0.1", "", { "dependencies": { "@solana/codecs-core": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/errors": "6.0.1" }, "peerDependencies": { "fastestsmallesttextencoderdecoder": "^1.0.22", "typescript": "^5.0.0" }, "optionalPeers": ["fastestsmallesttextencoderdecoder", "typescript"] }, "sha512-OmMIfMFbbJVIxveBeATKCj9DsmZ8l4vJPnOLHUop0hLWRiYHTQ1qokMqfk/X8PCmUjXmbXnlp63BikGtdKN3/g=="],
+
+    "@solana/errors": ["@solana/errors@6.0.1", "", { "dependencies": { "chalk": "5.6.2", "commander": "14.0.3" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"], "bin": { "errors": "bin/cli.mjs" } }, "sha512-sMe5GCsXto8F1KDeq9GbZR0+m841SqEYep3NAcYlC0lqF2RG4giaaPQHgrWI5DJR/L7yc8FzUIQfTxnaN7bwOQ=="],
+
+    "@solana/fast-stable-stringify": ["@solana/fast-stable-stringify@6.0.1", "", { "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-60F0TaKm+mbIfsj94TaPgO2mbKtXVYyELC1Kf8YoRo9jIQSXVGXdljXR1UzqSxrN6V4Ueyx3RE5jW9fAIzQZ/A=="],
+
+    "@solana/functional": ["@solana/functional@6.0.1", "", { "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-qHPw87tCf4Kq4H9cpH6XV/C1wKJzSj0OQ8t+BqbFxvpX+c7svSRUY/It2gJOAcJd9f9hduQ3ZrqARXOU7aILvw=="],
+
+    "@solana/instruction-plans": ["@solana/instruction-plans@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/instructions": "6.0.1", "@solana/keys": "6.0.1", "@solana/promises": "6.0.1", "@solana/transaction-messages": "6.0.1", "@solana/transactions": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-aEwCfksUxVgcrOGnDJmmIp4phYn+DpOeS0fq7v3uteBu7T7lkwW+EJCu2iT1j1VLxcjDuPf243pNBp5GR13+yw=="],
+
+    "@solana/instructions": ["@solana/instructions@6.0.1", "", { "dependencies": { "@solana/codecs-core": "6.0.1", "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-qNTc3GrmiesN2x27Ap8qhKKn9vIocz/1Dc/Am7hiYU4TFiKtuj34TARyDa5VVbLGKRY5vZCpNsX2jqVx2V0lSQ=="],
+
+    "@solana/keys": ["@solana/keys@6.0.1", "", { "dependencies": { "@solana/assertions": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/nominal-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-naN3yRzN2VDJUgdcrxwsObr2ik8MV2brOI/MLrOWDUW8nlVfcs4OC7mB/HC1hYd60DT0rsP18P33Gjd8juknYw=="],
+
+    "@solana/kit": ["@solana/kit@6.0.1", "", { "dependencies": { "@solana/accounts": "6.0.1", "@solana/addresses": "6.0.1", "@solana/codecs": "6.0.1", "@solana/errors": "6.0.1", "@solana/functional": "6.0.1", "@solana/instruction-plans": "6.0.1", "@solana/instructions": "6.0.1", "@solana/keys": "6.0.1", "@solana/offchain-messages": "6.0.1", "@solana/plugin-core": "6.0.1", "@solana/programs": "6.0.1", "@solana/rpc": "6.0.1", "@solana/rpc-api": "6.0.1", "@solana/rpc-parsed-types": "6.0.1", "@solana/rpc-spec-types": "6.0.1", "@solana/rpc-subscriptions": "6.0.1", "@solana/rpc-types": "6.0.1", "@solana/signers": "6.0.1", "@solana/sysvars": "6.0.1", "@solana/transaction-confirmation": "6.0.1", "@solana/transaction-messages": "6.0.1", "@solana/transactions": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-zCU5URMgkCgL5hZOxjIzhAD7SjqVAJN4sbpyC4MatxbXE/NGoabPc4I2y5STrXsZLokQD0t4KZ1zs9v5M8Ylag=="],
+
+    "@solana/kit-plugin-rpc": ["@solana/kit-plugin-rpc@0.2.0", "", { "peerDependencies": { "@solana/kit": "^5.2.0" } }, "sha512-IH1deEmQ18hBCA+IYF6OASPOd4L3FZz0YP5aVx96EFC/PZrvIZmmFYd3m1cUjEveqm/vHVnlhOIRt11mj7tjAA=="],
+
+    "@solana/nominal-types": ["@solana/nominal-types@6.0.1", "", { "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-2/1loP3iHgLQIaeksrDPNL2be2zboKbsF2EKDAt7zqbiDCOsPY9Kgdq50WJGGileIXD0v7yincq6UTdOLcaR8Q=="],
+
+    "@solana/offchain-messages": ["@solana/offchain-messages@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-data-structures": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/keys": "6.0.1", "@solana/nominal-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-lwpNl+kusH2v5nLgUfwxme66uDonCn8+TqzYqJeENolaAbV0nnF8rV4ZHjfFs1Bc/3UG+TxrI0WYvRI+B5nVBA=="],
+
+    "@solana/options": ["@solana/options@6.0.1", "", { "dependencies": { "@solana/codecs-core": "6.0.1", "@solana/codecs-data-structures": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-ld13WWyMgicU8FkN6dNOmMJgVaV0uqU8HDQRJCfClsPl0v2TQ1t3aOYHkxpYfX+OvBjja1x2v2wflqJgUHKS+Q=="],
+
+    "@solana/plugin-core": ["@solana/plugin-core@6.0.1", "", { "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-mrVb6cf/HurU93z2bgCOoRxWuZWF/fWzIK+v7YMl9t8aKHhGdB4/iElXvPwGoArapZJaAe7dRqHgCJvYRPFvCg=="],
+
+    "@solana/programs": ["@solana/programs@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-eKsSVuADG/bzTu66iwhJctbIEQQLZVnD/kx98gtPAuNG6Z1WjMXO8tn6EYLn3ndc5yS+oeNSQBV6z3ozL+gTkQ=="],
+
+    "@solana/promises": ["@solana/promises@6.0.1", "", { "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-6W8yFBtjhwy8Gn7aagXBUjiQejpa+ENgqot2uy3LACQPQMCnd+TwZk9Pggnm5+Q12rm+d9bMvAa4110eoXR0Bw=="],
+
+    "@solana/rpc": ["@solana/rpc@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/fast-stable-stringify": "6.0.1", "@solana/functional": "6.0.1", "@solana/rpc-api": "6.0.1", "@solana/rpc-spec": "6.0.1", "@solana/rpc-spec-types": "6.0.1", "@solana/rpc-transformers": "6.0.1", "@solana/rpc-transport-http": "6.0.1", "@solana/rpc-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-fuRnm1SNcRLWii6N3WeJL8LSJJDEVEdS+ZDXclUWAPXUccl6wGb99/1tHWeOOwczgk9nmWoTYY9XeOLJt88HSg=="],
+
+    "@solana/rpc-api": ["@solana/rpc-api@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/keys": "6.0.1", "@solana/rpc-parsed-types": "6.0.1", "@solana/rpc-spec": "6.0.1", "@solana/rpc-transformers": "6.0.1", "@solana/rpc-types": "6.0.1", "@solana/transaction-messages": "6.0.1", "@solana/transactions": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-lCXPGHx2eF8wl0kdpuDLWX44vdDaTcPTAD9hCIsHQFLWeahJDarieoOacaAuse6TsRtGaPExBvbW6Da555Lnaw=="],
+
+    "@solana/rpc-parsed-types": ["@solana/rpc-parsed-types@6.0.1", "", { "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-2CnWhtJuiOgefU3EerwM1bg/OvmLJTMBUuGiSVoVAr7WfGjUXcoRa3mNO0HUDDoRo2gZwM/8BaFzhiRSbamsmQ=="],
+
+    "@solana/rpc-spec": ["@solana/rpc-spec@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/rpc-spec-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-SfZZUCbpiKNHsIAYq9WKd6PhnpXkH8ASRIda9KMkpFtTVg1thm4sA/A/Jpk8vJDpUVvzYLBVblNHQWqwRiRxAA=="],
+
+    "@solana/rpc-spec-types": ["@solana/rpc-spec-types@6.0.1", "", { "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-dosqI9gWs5Cz5T9Uanu4FkMkBN7AD6bRVw0YDIkalRcpC50Ak2iP48fJKArw3lh/phjcxEBVQxY3XeKEVGZP7Q=="],
+
+    "@solana/rpc-subscriptions": ["@solana/rpc-subscriptions@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/fast-stable-stringify": "6.0.1", "@solana/functional": "6.0.1", "@solana/promises": "6.0.1", "@solana/rpc-spec-types": "6.0.1", "@solana/rpc-subscriptions-api": "6.0.1", "@solana/rpc-subscriptions-channel-websocket": "6.0.1", "@solana/rpc-subscriptions-spec": "6.0.1", "@solana/rpc-transformers": "6.0.1", "@solana/rpc-types": "6.0.1", "@solana/subscribable": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-h2LXD8PiXPZca3vtECmUSEzLjc5m6EswgnJcq+HtJqA0M+xINFRl8mL6yS5D2d1Cf7sl/CwU/7935GJ8uLFeJA=="],
+
+    "@solana/rpc-subscriptions-api": ["@solana/rpc-subscriptions-api@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/keys": "6.0.1", "@solana/rpc-subscriptions-spec": "6.0.1", "@solana/rpc-transformers": "6.0.1", "@solana/rpc-types": "6.0.1", "@solana/transaction-messages": "6.0.1", "@solana/transactions": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-yj6niyZ6jqwg4u4oi55gDPzDNwXdgGBuu1zVfUnD6auCavDl4OxziUEtRIQ3NURJZa5kjTqQ48TuR0tD55vfiA=="],
+
+    "@solana/rpc-subscriptions-channel-websocket": ["@solana/rpc-subscriptions-channel-websocket@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/functional": "6.0.1", "@solana/rpc-subscriptions-spec": "6.0.1", "@solana/subscribable": "6.0.1", "ws": "^8.19.0" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-lxjfG+krZF8np69SQyRbmQL8jYNV/G69Ak782GYYfkEdAYztFs9OOQMgZNuciIgUlQAcXWWkNjJ6GhIbisg9NA=="],
+
+    "@solana/rpc-subscriptions-spec": ["@solana/rpc-subscriptions-spec@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/promises": "6.0.1", "@solana/rpc-spec-types": "6.0.1", "@solana/subscribable": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-FhZOXpP71R5y7q0TEvAFNJ+WmxIJUfhQicgae71WQtaiw+vM/dFnT/AL3I9rRBVzF0UQ7wIeqkuVKltdJEdzqQ=="],
+
+    "@solana/rpc-transformers": ["@solana/rpc-transformers@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/functional": "6.0.1", "@solana/nominal-types": "6.0.1", "@solana/rpc-spec-types": "6.0.1", "@solana/rpc-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-tkyTh5jwK/IZV+jI4plFttG1l43g47YB/laFtxYvu8OZx5RTCljryPh5RamjxGAhFk3w6xnLZJbc3MBk8VrPsQ=="],
+
+    "@solana/rpc-transport-http": ["@solana/rpc-transport-http@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1", "@solana/rpc-spec": "6.0.1", "@solana/rpc-spec-types": "6.0.1", "undici-types": "^7.20.0" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-l9TOpQq4cSIhReyzLJb7j+03YaUDClDJOzJr7ZQSo1fqt7Ww6C5+dKOVIUUu6tg9AOO8mCA0QVT/rFmZ9ZjhiQ=="],
+
+    "@solana/rpc-types": ["@solana/rpc-types@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/nominal-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-40nXhThKNzh0ih2Pd8ACsIKPgVaP/6OqbLfgcZxPjZ10XjhjMy9crwW1ZF0EPhK8uo+bs9gtztl9OVWWgYYrNQ=="],
+
+    "@solana/signers": ["@solana/signers@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/errors": "6.0.1", "@solana/instructions": "6.0.1", "@solana/keys": "6.0.1", "@solana/nominal-types": "6.0.1", "@solana/offchain-messages": "6.0.1", "@solana/transaction-messages": "6.0.1", "@solana/transactions": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-iby4CGjk4pBNqytpyyPK2IGZ8/BMcrdtubVCuSYze2DJE3RdrPkuhVv2A6A6Cfk/0DPfUkqZQtTNMxCOj6oCbw=="],
+
+    "@solana/subscribable": ["@solana/subscribable@6.0.1", "", { "dependencies": { "@solana/errors": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-GGXvRVzOAJlbGwwgOHbcxwT8lILkgrlHYO72ChkG8IbJWq7eTi1+Uz3TQTsXtC923dZ2XHLqp+aHl7Kx3L3ENg=="],
+
+    "@solana/sysvars": ["@solana/sysvars@6.0.1", "", { "dependencies": { "@solana/accounts": "6.0.1", "@solana/codecs": "6.0.1", "@solana/errors": "6.0.1", "@solana/rpc-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-fSMasRQUfbzrhZ3t0XdVpwIezHRelPx3ZxkqyUy8Lx/90YzR1kxaJpmNS7c1pBV60scdiJVQ4vXQtetKxIgRVQ=="],
+
+    "@solana/transaction-confirmation": ["@solana/transaction-confirmation@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/keys": "6.0.1", "@solana/promises": "6.0.1", "@solana/rpc": "6.0.1", "@solana/rpc-subscriptions": "6.0.1", "@solana/rpc-types": "6.0.1", "@solana/transaction-messages": "6.0.1", "@solana/transactions": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-x0sXnS75xwchAtQU0UbQ7wBQoWqgUQkn0G4DKQMEGllWGRsJFvpQzuUqAgh5fNhe2sMt8+4QdQHrI01zUNDDtQ=="],
+
+    "@solana/transaction-messages": ["@solana/transaction-messages@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-data-structures": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/errors": "6.0.1", "@solana/functional": "6.0.1", "@solana/instructions": "6.0.1", "@solana/nominal-types": "6.0.1", "@solana/rpc-types": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-lpSyXsFPMCDo5Vf0LLsdj5+WyYxUD+8WEMWuVDYiG/7e8fVjLEsZ6k/UpvyI7ZJnkMhfwEa3DRAubNDH1Biafg=="],
+
+    "@solana/transactions": ["@solana/transactions@6.0.1", "", { "dependencies": { "@solana/addresses": "6.0.1", "@solana/codecs-core": "6.0.1", "@solana/codecs-data-structures": "6.0.1", "@solana/codecs-numbers": "6.0.1", "@solana/codecs-strings": "6.0.1", "@solana/errors": "6.0.1", "@solana/functional": "6.0.1", "@solana/instructions": "6.0.1", "@solana/keys": "6.0.1", "@solana/nominal-types": "6.0.1", "@solana/rpc-types": "6.0.1", "@solana/transaction-messages": "6.0.1" }, "peerDependencies": { "typescript": "^5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-VLFug8oKCpEyZv/mMMnQIraupXwMUzO4KzA/kGBHbUnCX95K7UFpc07AFc1nXGbo1jBBO4e+O2cnVWg097Yz0A=="],
+
     "@types/bun": ["@types/bun@1.3.6", "", { "dependencies": { "bun-types": "1.3.6" } }, "sha512-uWCv6FO/8LcpREhenN1d1b6fcspAB+cefwD7uti8C8VffIv0Um08TKMn98FynpTiU38+y2dUO55T11NgDt8VAA=="],
 
     "@types/estree": ["@types/estree@1.0.8", "", {}, "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w=="],
@@ -264,6 +349,8 @@
 
     "call-me-maybe": ["call-me-maybe@1.0.2", "", {}, "sha512-HpX65o1Hnr9HH25ojC1YGs7HCQLq0GCOibSaWER0eNpgJ/Z1MZv2mTc7+xh6WOPxbRVcmgbv4hGU+uSQ/2xFZQ=="],
 
+    "chalk": ["chalk@5.6.2", "", {}, "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="],
+
     "chardet": ["chardet@2.1.1", "", {}, "sha512-PsezH1rqdV9VvyNhxxOW32/d75r01NY7TQCmOqomRo15ZSOKbpTFVsfjghxo6JloQUCGnH4k1LGu0R4yCLlWQQ=="],
 
     "chokidar": ["chokidar@4.0.3", "", { "dependencies": { "readdirp": "^4.0.1" } }, "sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA=="],
@@ -275,6 +362,8 @@
     "confbox": ["confbox@0.1.8", "", {}, "sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w=="],
 
     "consola": ["consola@3.4.2", "", {}, "sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA=="],
+
+    "copy-anything": ["copy-anything@4.0.5", "", { "dependencies": { "is-what": "^5.2.0" } }, "sha512-7Vv6asjS4gMOuILabD3l739tsaxFQmC+a7pLZm02zyvs8p977bL3zEgq3yDk5rn9B0PbYgIv++jmHcuUab4RhA=="],
 
     "cross-spawn": ["cross-spawn@7.0.6", "", { "dependencies": { "path-key": "^3.1.0", "shebang-command": "^2.0.0", "which": "^2.0.1" } }, "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA=="],
 
@@ -333,6 +422,8 @@
     "is-number": ["is-number@7.0.0", "", {}, "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng=="],
 
     "is-subdir": ["is-subdir@1.2.0", "", { "dependencies": { "better-path-resolve": "1.0.0" } }, "sha512-2AT6j+gXe/1ueqbW6fLZJiIw3F8iXGJtt0yDrZaBhAZEG1raiTxKWU+IPqMCzQAXOUCKdA4UDMgacKH25XG2Cw=="],
+
+    "is-what": ["is-what@5.5.0", "", {}, "sha512-oG7cgbmg5kLYae2N5IVd3jm2s+vldjxJzK1pcu9LfpGuQ93MQSzo0okvRna+7y5ifrD+20FE8FvjusyGaz14fw=="],
 
     "is-windows": ["is-windows@1.0.2", "", {}, "sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA=="],
 
@@ -466,6 +557,8 @@
 
     "sucrase": ["sucrase@3.35.1", "", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.2", "commander": "^4.0.0", "lines-and-columns": "^1.1.6", "mz": "^2.7.0", "pirates": "^4.0.1", "tinyglobby": "^0.2.11", "ts-interface-checker": "^0.1.9" }, "bin": { "sucrase": "bin/sucrase", "sucrase-node": "bin/sucrase-node" } }, "sha512-DhuTmvZWux4H1UOnWMB3sk0sbaCVOoQZjv8u1rDoTV0HTdGem9hkAZtl4JZy8P2z4Bg0nT+YMeOFyVr4zcG5Tw=="],
 
+    "superjson": ["superjson@2.2.6", "", { "dependencies": { "copy-anything": "^4" } }, "sha512-H+ue8Zo4vJmV2nRjpx86P35lzwDT3nItnIsocgumgr0hHMQ+ZGq5vrERg9kJBo5AWGmxZDhzDo+WVIJqkB0cGA=="],
+
     "term-size": ["term-size@2.2.1", "", {}, "sha512-wK0Ri4fOGjv/XPy8SBHZChl8CM7uMc5VML7SqiQ0zG7+J5Vr+RMQDoHa2CNT6KHUnTGIXH34UDMkPzAUyapBZg=="],
 
     "thenify": ["thenify@3.3.1", "", { "dependencies": { "any-promise": "^1.0.0" } }, "sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw=="],
@@ -508,6 +601,8 @@
 
     "wrappy": ["wrappy@1.0.2", "", {}, "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ=="],
 
+    "ws": ["ws@8.19.0", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": ">=5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg=="],
+
     "zod": ["zod@3.25.76", "", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
     "zod-package-json": ["zod-package-json@1.2.0", "", { "dependencies": { "zod": "^3.25.64" } }, "sha512-tamtgPM3MkP+obfO2dLr/G+nYoYkpJKmuHdYEy6IXRKfLybruoJ5NUj0lM0LxwOpC9PpoGLbll1ecoeyj43Wsg=="],
@@ -533,6 +628,10 @@
     "@octokit/request/@octokit/types": ["@octokit/types@13.10.0", "", { "dependencies": { "@octokit/openapi-types": "^24.2.0" } }, "sha512-ifLaO34EbbPj0Xgro4G5lP5asESjwHracYJvVaPIyXMuiuXLlhic3S47cBdTb+jfODkTE5YtGCLt3Ay3+J97sA=="],
 
     "@octokit/request-error/@octokit/types": ["@octokit/types@13.10.0", "", { "dependencies": { "@octokit/openapi-types": "^24.2.0" } }, "sha512-ifLaO34EbbPj0Xgro4G5lP5asESjwHracYJvVaPIyXMuiuXLlhic3S47cBdTb+jfODkTE5YtGCLt3Ay3+J97sA=="],
+
+    "@solana/errors/commander": ["commander@14.0.3", "", {}, "sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw=="],
+
+    "@solana/rpc-transport-http/undici-types": ["undici-types@7.20.0", "", {}, "sha512-PZDAAlMkNw5ZzN/ebfyrwzrMWfIf7Jbn9iM/I6SF456OKrb2wnfqVowaxEY/cMAM8MjFu1zhdpJyA0L+rTYwNw=="],
 
     "micromatch/picomatch": ["picomatch@2.3.1", "", {}, "sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA=="],
 
