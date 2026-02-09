@@ -21,6 +21,9 @@
   "scripts": {
     "check-types": "tsc -b --noEmit",
     "dev": "bun run --hot src/api.ts",
+    "docker:build": "docker build -t ghcr.io/beeman/solana-mobile-seeker-genesis-holders .",
+    "docker:push": "docker push ghcr.io/beeman/solana-mobile-seeker-genesis-holders",
+    "docker:run": "docker run --rm --name seeker-genesis-holders --init --stop-signal=SIGINT -it --env-file .env -p 3000:3000 ghcr.io/beeman/solana-mobile-seeker-genesis-holders",
     "index": "bun run src/index.ts",
     "index:all": "bun run src/index.ts --all",
     "index:epoch": "bun run src/index.ts --epoch",
