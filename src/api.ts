@@ -6,6 +6,78 @@ import { epochs, holders } from './db/schema.ts'
 const db = createDb()
 const app = new Hono()
 
+app.get('/', async (c) => {
+  const [countResult] = await db.select({ total: sql<number>`count(*)` }).from(holders)
+  const totalHolders = countResult?.total ?? 0
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seeker Genesis Holders API</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0a0a0a; color: #e4e4e7; line-height: 1.6; padding: 2rem; }
+    .container { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem; }
+    .subtitle { color: #a1a1aa; margin-bottom: 2rem; }
+    .stat { display: inline-block; background: #18181b; border: 1px solid #27272a; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 2rem; }
+    .stat-value { font-size: 1.25rem; font-weight: 600; color: #22d3ee; }
+    .stat-label { font-size: 0.875rem; color: #a1a1aa; }
+    h2 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem; margin-top: 1.5rem; }
+    .endpoint { background: #18181b; border: 1px solid #27272a; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem; }
+    .method { color: #22d3ee; font-weight: 600; font-size: 0.75rem; margin-right: 0.5rem; }
+    .path { font-family: ui-monospace, monospace; font-size: 0.875rem; }
+    .path a { color: #e4e4e7; text-decoration: none; }
+    .path a:hover { color: #22d3ee; }
+    .desc { color: #a1a1aa; font-size: 0.8125rem; margin-top: 0.25rem; }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #27272a; color: #52525b; font-size: 0.8125rem; }
+    footer a { color: #a1a1aa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Seeker Genesis Holders API</h1>
+    <p class="subtitle">Tracks ownership of Solana Mobile Seeker Genesis NFTs on the Solana blockchain.</p>
+
+    <div class="stat">
+      <div class="stat-value">${totalHolders.toLocaleString()}</div>
+      <div class="stat-label">indexed holders</div>
+    </div>
+
+    <h2>Endpoints</h2>
+
+    <div class="endpoint">
+      <div><span class="method">GET</span><span class="path"><a href="/health">/health</a></span></div>
+      <div class="desc">Health check &mdash; returns server status and total holder count.</div>
+    </div>
+
+    <div class="endpoint">
+      <div><span class="method">GET</span><span class="path"><a href="/api/holders">/api/holders</a></span></div>
+      <div class="desc">Paginated list of all holders. Query params: <code>page</code> (default 1), <code>limit</code> (default 20, max 100).</div>
+    </div>
+
+    <div class="endpoint">
+      <div><span class="method">GET</span><span class="path">/api/holders/:wallet</span></div>
+      <div class="desc">Look up a specific wallet. Returns mint details or 404 if not a holder.</div>
+    </div>
+
+    <div class="endpoint">
+      <div><span class="method">GET</span><span class="path"><a href="/api/epochs">/api/epochs</a></span></div>
+      <div class="desc">Lists all indexed epochs with holder counts and block time ranges.</div>
+    </div>
+
+    <footer>
+      <a href="https://github.com/beeman/solana-mobile-seeker-genesis-holders">GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>`
+
+  return c.html(html)
+})
+
 app.get('/health', async (c) => {
   const [countResult] = await db.select({ total: sql<number>`count(*)` }).from(holders)
 
