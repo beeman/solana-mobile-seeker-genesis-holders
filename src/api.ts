@@ -97,7 +97,7 @@ app.get('/', async (c) => {
     <img src="${chartUrl}" alt="Holders by epoch" style="width:100%;border-radius:0.5rem;" />
 
     <footer>
-      <a href="https://github.com/beeman/solana-mobile-seeker-genesis-holders">GitHub</a>
+      Created by <a href="https://github.com/beeman">beeman</a> and <a href="https://github.com/obrera">obrera</a> using Claude &mdash; <a href="https://github.com/beeman/solana-mobile-seeker-genesis-holders">GitHub</a>
     </footer>
   </div>
 </body>
