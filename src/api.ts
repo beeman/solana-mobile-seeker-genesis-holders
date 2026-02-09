@@ -59,7 +59,11 @@ app.get('/', async (c) => {
     .desc { color: #a1a1aa; font-size: 0.8125rem; margin-top: 0.25rem; }
     footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #27272a; color: #52525b; font-size: 0.8125rem; }
     footer a { color: #a1a1aa; }
+    pre { background: #18181b; border: 1px solid #27272a; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; }
+    pre code.hljs { background: transparent; padding: 0; font-family: ui-monospace, monospace; font-size: 0.8125rem; line-height: 1.5; }
+    .snippet-desc { color: #a1a1aa; font-size: 0.8125rem; margin-bottom: 0.75rem; }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
 </head>
 <body>
   <div class="container">
@@ -93,6 +97,54 @@ app.get('/', async (c) => {
       <div class="desc">Lists all indexed epochs with holder counts and block time ranges.</div>
     </div>
 
+    <h2>Token gate snippet</h2>
+    <p class="snippet-desc">Drop this function into your TypeScript app to check if a wallet holds a Seeker Genesis NFT.</p>
+    <pre><code class="language-typescript">import { type Address, assertIsAddress } from "@solana/kit";
+
+const SEEKER_GENESIS_API = "https://seeker-genesis.colmena.dev";
+
+interface SeekerGenesisMint {
+  ata: string;
+  blockTime: number;
+  epoch: number;
+  mint: string;
+  signature: string;
+  slot: string;
+}
+
+type SeekerGenesisResult =
+  | { isHolder: true; mint: SeekerGenesisMint }
+  | { isHolder: false; mint: null };
+
+async function checkSeekerGenesisHolder(
+  address: Address | string,
+): Promise&lt;SeekerGenesisResult&gt; {
+  assertIsAddress(address);
+  const response = await fetch(
+    \`\${SEEKER_GENESIS_API}/api/holders/\${address}\`,
+  ).catch((error) =&gt; {
+    throw new Error(
+      \`Failed to connect to Seeker Genesis API: \${error}\`,
+    );
+  });
+
+  if (response.status === 404) {
+    return { isHolder: false, mint: null };
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      \`API error: \${response.status} \${response.statusText}\`,
+    );
+  }
+
+  const { mints } = (await response.json()) as { mints: SeekerGenesisMint[] };
+
+  return mints[0]
+    ? { isHolder: true, mint: mints[0] }
+    : { isHolder: false, mint: null };
+}</code></pre>
+
     <h2>Holders by epoch</h2>
     <img src="${chartUrl}" alt="Holders by epoch" style="width:100%;border-radius:0.5rem;" />
 
@@ -100,6 +152,9 @@ app.get('/', async (c) => {
       Created by <a href="https://github.com/beeman">beeman</a> and <a href="https://github.com/obrera">obrera</a> using Claude &mdash; <a href="https://github.com/beeman/solana-mobile-seeker-genesis-holders">GitHub</a>
     </footer>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script>hljs.highlightAll();</script>
 </body>
 </html>`
 
