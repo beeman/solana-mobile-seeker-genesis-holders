@@ -1,12 +1,15 @@
 {
   "dependencies": {
+    "@libsql/client": "^0.17.0",
     "@solana/kit": "^6.0.1",
     "@solana/kit-plugin-rpc": "^0.2.0",
-    "superjson": "^2.2.6"
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.11.9"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "drizzle-kit": "^0.31.9"
   },
   "license": "MIT",
   "name": "solana-mobile-seeker-genesis-holders",
@@ -17,8 +20,13 @@
   },
   "scripts": {
     "check-types": "tsc -b --noEmit",
+    "dev": "bun run --hot src/api.ts",
+    "index": "bun run src/index.ts",
+    "index:all": "bun run src/index.ts --all",
+    "index:epoch": "bun run src/index.ts --epoch",
     "lint": "biome check --error-on-warnings",
     "lint:fix": "biome check --error-on-warnings --write",
+    "serve": "bun run src/api.ts",
     "test": "bun test",
     "test:watch": "bun test --watch"
   },

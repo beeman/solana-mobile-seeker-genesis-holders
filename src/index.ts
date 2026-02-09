@@ -1,22 +1,21 @@
-import { address } from '@solana/kit'
-import { buildHoldersList } from './build-holders.ts'
-import { syncSignatures } from './indexer.ts'
-import { createSolanaClient } from './solana-client.ts'
-import { processAllTransactions } from './tx-fetcher.ts'
+import { createDb } from './db/index.ts'
+import { indexAll, indexEpoch, syncLatest } from './indexer-db.ts'
 
-const client = createSolanaClient()
+const db = createDb()
 
-const genesis = await client.rpc.getGenesisHash().send()
+const args = Bun.argv.slice(2)
+const command = args[0]
 
-const payer = address('GT2zuHVaZQYZSyQMgJPLzvkmyztfyXg2NJunqFp4p3A4')
-const group = address('GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te')
-
-console.log('Summary', {
-  genesis,
-  group,
-  payer,
-})
-
-await syncSignatures()
-await processAllTransactions()
-await buildHoldersList()
+if (command === '--epoch') {
+  const epoch = Number(args[1])
+  if (Number.isNaN(epoch)) {
+    console.error('Usage: bun run src/index.ts --epoch <number>')
+    process.exit(1)
+  }
+  await indexEpoch(db, epoch)
+} else if (command === '--all') {
+  await indexAll(db)
+} else {
+  // Default: sync latest (for cron job)
+  await syncLatest(db)
+}

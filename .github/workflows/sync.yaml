@@ -4,9 +4,11 @@ on:
   schedule:
     - cron: '0 * * * *' # every hour
   workflow_dispatch:
-
-permissions:
-  contents: write
+    inputs:
+      epoch:
+        description: 'Specific epoch to re-index (leave empty for default sync)'
+        required: false
+        type: string
 
 jobs:
   sync:
@@ -18,14 +20,20 @@ jobs:
       - name: Setup Environment
         uses: ./.github/actions/setup
 
+      - name: Run migrations
+        run: bunx drizzle-kit migrate
+        env:
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+
       - name: Run sync
-        run: bun run src/index.ts
+        run: |
+          if [ -n "${{ inputs.epoch }}" ]; then
+            bun run src/index.ts --epoch ${{ inputs.epoch }}
+          else
+            bun run src/index.ts
+          fi
         env:
           SOLANA_ENDPOINT: ${{ secrets.SOLANA_ENDPOINT }}
-
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git diff --staged --quiet || git commit -m "chore: sync holders data" && git push
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
