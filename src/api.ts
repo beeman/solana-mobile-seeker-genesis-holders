@@ -19,16 +19,46 @@ app.get('/', async (c) => {
     return new Date(e.firstBlockTime * 1000).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
   })
   const chartData = chartEpochs.map((e) => e.holderCount)
+  let cumulative = 0
+  const cumulativeData = chartEpochs.map((e) => {
+    cumulative += e.holderCount
+    return cumulative
+  })
   const chartConfig = {
     data: {
-      datasets: [{ backgroundColor: '#22d3ee', data: chartData, label: 'Holders' }],
+      datasets: [
+        { backgroundColor: '#22d3ee', data: chartData, label: 'Per epoch', type: 'bar', yAxisID: 'epoch' },
+        {
+          borderColor: '#a78bfa',
+          borderWidth: 2,
+          data: cumulativeData,
+          fill: false,
+          label: 'Total',
+          pointRadius: 0,
+          type: 'line',
+          yAxisID: 'total',
+        },
+      ],
       labels: chartLabels,
     },
     options: {
-      legend: { display: false },
+      legend: { labels: { fontColor: '#a1a1aa' } },
       scales: {
         xAxes: [{ gridLines: { color: '#27272a' }, ticks: { fontColor: '#a1a1aa' } }],
-        yAxes: [{ gridLines: { color: '#27272a' }, ticks: { beginAtZero: true, fontColor: '#a1a1aa' } }],
+        yAxes: [
+          {
+            gridLines: { color: '#27272a' },
+            id: 'epoch',
+            position: 'left',
+            ticks: { beginAtZero: true, fontColor: '#a1a1aa' },
+          },
+          {
+            gridLines: { drawOnChartArea: false },
+            id: 'total',
+            position: 'right',
+            ticks: { beginAtZero: true, fontColor: '#a78bfa' },
+          },
+        ],
       },
     },
     type: 'bar',
