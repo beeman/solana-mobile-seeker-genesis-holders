@@ -6,6 +6,16 @@ import { epochs, holders } from './db/schema.ts'
 const db = createDb()
 const app = new Hono()
 
+app.get('/health', async (c) => {
+  const [countResult] = await db.select({ total: sql<number>`count(*)` }).from(holders)
+  
+  return c.json({
+    status: 'ok',
+    uptime: Math.floor(process.uptime()),
+    totalHolders: countResult?.total ?? 0,
+  })
+})
+
 app.get('/api/holders/:wallet', async (c) => {
   const wallet = c.req.param('wallet')
   const results = await db.select().from(holders).where(eq(holders.holder, wallet))
