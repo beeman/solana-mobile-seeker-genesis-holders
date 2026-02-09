@@ -190,7 +190,12 @@ export async function indexEpoch(db: Db, epoch: number): Promise<{ holderCount: 
   // 2. Fetch and extract mint records
   const mints = await fetchMintRecords(client, signatures, epoch)
 
-  // 3. Write to DB in a transaction (idempotent: delete + re-insert)
+  // 3. Compute epoch time range from block times
+  const blockTimes = mints.map((m) => m.blockTime).filter((t): t is number => t !== null)
+  const firstBlockTime = blockTimes.length > 0 ? Math.min(...blockTimes) : null
+  const lastBlockTime = blockTimes.length > 0 ? Math.max(...blockTimes) : null
+
+  // 4. Write to DB in a transaction (idempotent: delete + re-insert)
   await db.transaction(async (tx) => {
     await tx.delete(holders).where(eq(holders.epoch, epoch))
 
@@ -212,13 +217,17 @@ export async function indexEpoch(db: Db, epoch: number): Promise<{ holderCount: 
       .insert(epochs)
       .values({
         epoch,
+        firstBlockTime,
         holderCount: mints.length,
         indexedAt: new Date().toISOString(),
+        lastBlockTime,
       })
       .onConflictDoUpdate({
         set: {
+          firstBlockTime,
           holderCount: mints.length,
           indexedAt: new Date().toISOString(),
+          lastBlockTime,
         },
         target: epochs.epoch,
       })

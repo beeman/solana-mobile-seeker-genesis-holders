@@ -22,8 +22,10 @@ async function createTestApp() {
   await db.run(sql`CREATE INDEX IF NOT EXISTS idx_holders_epoch ON holders(epoch)`)
   await db.run(sql`CREATE TABLE IF NOT EXISTS epochs (
     epoch INTEGER PRIMARY KEY,
+    first_block_time INTEGER,
     holder_count INTEGER NOT NULL DEFAULT 0,
-    indexed_at TEXT NOT NULL
+    indexed_at TEXT NOT NULL,
+    last_block_time INTEGER
   )`)
 
   const app = new Hono()

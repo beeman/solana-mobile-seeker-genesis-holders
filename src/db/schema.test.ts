@@ -22,7 +22,7 @@ describe('holders schema', () => {
 describe('epochs schema', () => {
   test('has expected columns', () => {
     const cols = getTableColumns(epochs)
-    expect(Object.keys(cols).sort()).toEqual(['epoch', 'holderCount', 'indexedAt'])
+    expect(Object.keys(cols).sort()).toEqual(['epoch', 'firstBlockTime', 'holderCount', 'indexedAt', 'lastBlockTime'])
   })
 
   test('epoch is primary key', () => {

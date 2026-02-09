@@ -17,6 +17,8 @@ export const holders = sqliteTable(
 
 export const epochs = sqliteTable('epochs', {
   epoch: int().primaryKey(),
+  firstBlockTime: int('first_block_time'),
   holderCount: int('holder_count').notNull().default(0),
   indexedAt: text('indexed_at').notNull(),
+  lastBlockTime: int('last_block_time'),
 })
