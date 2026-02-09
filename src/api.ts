@@ -8,11 +8,11 @@ const app = new Hono()
 
 app.get('/health', async (c) => {
   const [countResult] = await db.select({ total: sql<number>`count(*)` }).from(holders)
-  
+
   return c.json({
     status: 'ok',
-    uptime: Math.floor(process.uptime()),
     totalHolders: countResult?.total ?? 0,
+    uptime: Math.floor(process.uptime()),
   })
 })
 
