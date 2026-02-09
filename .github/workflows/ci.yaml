@@ -6,7 +6,6 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: write
 
 on:
   push:
@@ -20,23 +19,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup
-
-      - name: Build
-        run: bun run build
-
-      - name: Check package
-        run: bun x publint
-
-
-
   check-types:
     runs-on: ubuntu-latest
     steps:
