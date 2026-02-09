@@ -1,74 +1,203 @@
-# solana-mobile-seeker-genesis-holders
+# Solana Mobile Seeker Genesis Holders
 
-This is a template for creating a modern TypeScript library or package using [Bun](https://bun.sh/). It comes pre-configured with essential tools for development, testing, linting, and publishing.
+Indexes and serves Solana Mobile Seeker Genesis NFT holder data. Tracks which wallets hold Seeker Genesis NFTs, which mint they hold, and since when.
 
-## Features
+The NFT collection is immutable and non-transferable — once indexed, the data is final.
 
-*   **Bun-first development**: Leverages Bun for lightning-fast installs, runs, and tests.
-*   **TypeScript support**: Write type-safe code from the start.
-*   **Linting & Formatting**: Enforced with [Biome](https://biomejs.dev/) for consistent code style.
-*   **Bundling**: Uses [tsup](https://tsup.js.org/) for efficient bundling into ESM and CJS formats, with type declarations.
-*   **Testing**: Built-in unit testing with `bun test`.
-*   **Versioning & Publishing**: Managed with [Changesets](https://github.com/changesets/changesets) for streamlined releases to npm.
-*   **GitHub Actions**: Continuous Integration (CI) workflows for automated build, test, lint, and publish processes.
+## Tech Stack
 
-## Getting Started
+- **Runtime:** Bun
+- **Database:** Turso (libSQL)
+- **ORM:** Drizzle
+- **API:** Hono
+- **Indexer:** @solana/kit
 
-To use this template, you typically would use a scaffolding tool like `bunx create-something -t solana-mobile-seeker-genesis-holders`.
+## Setup
 
-### Installation
+### Prerequisites
 
-If you're using this template directly (e.g., after cloning), you can install dependencies with Bun:
+- [Bun](https://bun.sh)
+- A [Turso](https://turso.tech) database
+
+### Install dependencies
 
 ```bash
 bun install
 ```
 
-### Development
+### Environment variables
 
-*   **Build**: `bun run build`
-*   **Type Check**: `bun run check-types`
-*   **Lint**: `bun run lint`
-*   **Lint & Fix**: `bun run lint:fix`
-*   **Test**: `bun test`
-*   **Test (Watch Mode)**: `bun run test:watch`
+Create a `.env` file:
 
-### Publishing
-
-This template uses Changesets for versioning and publishing.
-
-1.  **Add a changeset**:
-    ```bash
-    bun changeset
-    ```
-    Follow the prompts to describe your changes. This will create a markdown file in `.changeset/`.
-
-2.  **Version packages**:
-    ```bash
-    bun run version
-    ```
-    This command reads the changeset files, updates package versions, updates `CHANGELOG.md`, and deletes the used changeset files. It also runs `bun lint:fix`.
-
-3.  **Publish to npm**:
-    ```bash
-    bun run release
-    ```
-    This command builds the package and publishes it to npm. Ensure you are logged into npm (`npm login`) or have `NPM_TOKEN` configured in your CI environment.
-
-## Project Structure
-
+```env
+SOLANA_ENDPOINT=<your_solana_rpc_endpoint>
+TURSO_DATABASE_URL=<your_turso_database_url>
+TURSO_AUTH_TOKEN=<your_turso_auth_token>
 ```
-.
-├── src/             # Source code for your library
-│   └── index.ts     # Main entry point for your library
-├── test/            # Unit tests
-│   └── index.test.ts # Example test file
-├── tsup.config.ts   # Configuration for tsup (bundling)
-├── biome.json       # Biome linter/formatter configuration
-├── package.json     # Project metadata and scripts
-└── ... (other config files and GitHub workflows)
+
+### Run database migrations
+
+```bash
+bunx drizzle-kit generate
+bunx drizzle-kit migrate
 ```
+
+## API
+
+### Start the development server
+
+```bash
+bun run dev
+```
+
+The API runs on `http://localhost:3000` by default. Set the `PORT` env var to change it.
+
+### Endpoints
+
+#### `GET /api/holders/:wallet`
+
+Check if a wallet holds a Seeker Genesis NFT. Returns the mint address, epoch, slot, and block time.
+
+```bash
+curl http://localhost:3000/api/holders/4pNxsmr4zu1RPQ6VLJBtZsm7cqCQwE9q6VSL8wJ8rzFX
+```
+
+```json
+{
+  "count": 1,
+  "holder": "4pNxsmr4zu1RPQ6VLJBtZsm7cqCQwE9q6VSL8wJ8rzFX",
+  "mints": [
+    {
+      "ata": "2UmMgeZUzvLbeZsNmuCdZ7wD57g6rFfYrFo37b7dV1mH",
+      "blockTime": 1738085008,
+      "epoch": 733,
+      "mint": "CUSWiFEeAaUbDMDfSkEgyVg3aj8QTf15CCHAh5acQmAC",
+      "signature": "3PN1vXGakR5TQz5Vwzc...",
+      "slot": "316960068"
+    }
+  ]
+}
+```
+
+Returns `404` if the wallet is not a holder.
+
+#### `GET /api/holders`
+
+Paginated list of all holders, ordered chronologically by slot.
+
+| Param | Default | Description |
+|-------|---------|-------------|
+| `page` | `1` | Page number |
+| `limit` | `20` | Items per page (max 100) |
+
+```bash
+curl "http://localhost:3000/api/holders?page=1&limit=3"
+```
+
+```json
+{
+  "data": [
+    {
+      "ata": "2UmMgeZUzvLbeZsNmuCdZ7wD57g6rFfYrFo37b7dV1mH",
+      "blockTime": 1738085008,
+      "epoch": 733,
+      "holder": "4pNxsmr4zu1RPQ6VLJBtZsm7cqCQwE9q6VSL8wJ8rzFX",
+      "mint": "CUSWiFEeAaUbDMDfSkEgyVg3aj8QTf15CCHAh5acQmAC",
+      "signature": "3PN1vXGakR5TQz5Vwzc...",
+      "slot": "316960068"
+    }
+  ],
+  "page": 1,
+  "pageCount": 37412,
+  "total": 112236
+}
+```
+
+#### `GET /api/epochs`
+
+Lists all indexed epochs with holder counts.
+
+```bash
+curl http://localhost:3000/api/epochs
+```
+
+```json
+{
+  "data": [
+    {
+      "epoch": 733,
+      "holderCount": 1,
+      "indexedAt": "2026-02-09T11:03:35.299Z"
+    }
+  ],
+  "totalHolders": 112236
+}
+```
+
+## Indexer
+
+The indexer fetches data from the Solana blockchain and writes directly to Turso. It supports per-epoch indexing.
+
+```bash
+# Sync latest (default - used by cron)
+bun run index
+
+# Index a specific epoch
+bun run index:epoch 731
+
+# Index all epochs from scratch
+bun run index:all
+```
+
+A GitHub Actions workflow runs `bun run index` every hour to pick up new data.
+
+## Docker
+
+### Build
+
+```bash
+bun run docker:build
+```
+
+### Run
+
+```bash
+bun run docker:run
+```
+
+This reads env vars from your `.env` file and exposes the API on `http://localhost:3000`.
+
+### Push to GHCR
+
+```bash
+bun run docker:push
+```
+
+### Run with docker directly
+
+```bash
+docker run --rm -it -p 3000:3000 \
+  -e TURSO_DATABASE_URL=<your_url> \
+  -e TURSO_AUTH_TOKEN=<your_token> \
+  ghcr.io/beeman/solana-mobile-seeker-genesis-holders
+```
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `bun run dev` | Start API with hot reload |
+| `bun run serve` | Start API (production) |
+| `bun run index` | Sync latest epochs |
+| `bun run index:epoch <N>` | Index a specific epoch |
+| `bun run index:all` | Index all epochs |
+| `bun run docker:build` | Build Docker image |
+| `bun run docker:run` | Run Docker container locally |
+| `bun run docker:push` | Push image to GHCR |
+| `bun test` | Run tests |
+| `bun run lint` | Lint with Biome |
+| `bun run check-types` | TypeScript type check |
 
 ## License
 
-MIT – see [LICENSE](./LICENSE).
+MIT
