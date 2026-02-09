@@ -7,8 +7,32 @@ const db = createDb()
 const app = new Hono()
 
 app.get('/', async (c) => {
-  const [countResult] = await db.select({ total: sql<number>`count(*)` }).from(holders)
+  const [[countResult], epochData] = await Promise.all([
+    db.select({ total: sql<number>`count(*)` }).from(holders),
+    db.select().from(epochs).orderBy(epochs.epoch),
+  ])
   const totalHolders = countResult?.total ?? 0
+
+  const chartLabels = epochData.map((e) => {
+    if (!e.firstBlockTime) return `Epoch ${e.epoch}`
+    return new Date(e.firstBlockTime * 1000).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+  })
+  const chartData = epochData.map((e) => e.holderCount)
+  const chartConfig = {
+    data: {
+      datasets: [{ backgroundColor: '#22d3ee', data: chartData, label: 'Holders' }],
+      labels: chartLabels,
+    },
+    options: {
+      legend: { display: false },
+      scales: {
+        xAxes: [{ gridLines: { color: '#27272a' }, ticks: { fontColor: '#a1a1aa' } }],
+        yAxes: [{ gridLines: { color: '#27272a' }, ticks: { beginAtZero: true, fontColor: '#a1a1aa' } }],
+      },
+    },
+    type: 'bar',
+  }
+  const chartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartConfig))}&backgroundColor=%230a0a0a&width=600&height=300`
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -67,6 +91,9 @@ app.get('/', async (c) => {
       <div><span class="method">GET</span><span class="path"><a href="/api/epochs">/api/epochs</a></span></div>
       <div class="desc">Lists all indexed epochs with holder counts and block time ranges.</div>
     </div>
+
+    <h2>Holders by epoch</h2>
+    <img src="${chartUrl}" alt="Holders by epoch" style="width:100%;border-radius:0.5rem;" />
 
     <footer>
       <a href="https://github.com/beeman/solana-mobile-seeker-genesis-holders">GitHub</a>
