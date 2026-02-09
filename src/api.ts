@@ -13,11 +13,12 @@ app.get('/', async (c) => {
   ])
   const totalHolders = countResult?.total ?? 0
 
-  const chartLabels = epochData.map((e) => {
+  const chartEpochs = epochData.filter((e) => e.holderCount > 0)
+  const chartLabels = chartEpochs.map((e) => {
     if (!e.firstBlockTime) return `Epoch ${e.epoch}`
     return new Date(e.firstBlockTime * 1000).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
   })
-  const chartData = epochData.map((e) => e.holderCount)
+  const chartData = chartEpochs.map((e) => e.holderCount)
   const chartConfig = {
     data: {
       datasets: [{ backgroundColor: '#22d3ee', data: chartData, label: 'Holders' }],
