@@ -2,9 +2,12 @@ import { eq, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createDb } from './db/index.ts'
 import { epochs, holders, meta } from './db/schema.ts'
+import { umamiTracking } from './umami.ts'
 
 const db = createDb()
 const app = new Hono()
+
+app.use('*', umamiTracking)
 
 app.get('/', async (c) => {
   const [[countResult], epochData, [lastCheckedRow]] = await Promise.all([
