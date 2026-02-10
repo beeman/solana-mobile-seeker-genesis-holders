@@ -5,6 +5,16 @@ import { epochs, holders, meta } from './db/schema.ts'
 import { umamiTracking } from './umami.ts'
 
 const db = createDb()
+
+// Sync embedded replica on startup and periodically
+const SYNC_INTERVAL_MS = 60_000 // 1 minute
+if ('client' in db && 'sync' in db.client) {
+  db.client.sync().then(() => console.log('[sync] Initial replica sync complete'))
+  setInterval(() => {
+    db.client.sync().catch((err: unknown) => console.error('[sync] Periodic sync failed:', err))
+  }, SYNC_INTERVAL_MS)
+}
+
 const app = new Hono()
 
 app.use('*', umamiTracking)
