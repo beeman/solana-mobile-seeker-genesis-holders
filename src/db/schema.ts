@@ -15,6 +15,11 @@ export const holders = sqliteTable(
   (table) => [index('idx_holders_holder').on(table.holder), index('idx_holders_epoch').on(table.epoch)],
 )
 
+export const meta = sqliteTable('meta', {
+  key: text().primaryKey(),
+  value: text().notNull(),
+})
+
 export const epochs = sqliteTable('epochs', {
   epoch: int().primaryKey(),
   firstBlockTime: int('first_block_time'),

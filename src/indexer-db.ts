@@ -1,7 +1,7 @@
 import { address, signature as solSignature } from '@solana/kit'
 import { eq } from 'drizzle-orm'
 import type { Db } from './db/index.ts'
-import { epochs, holders } from './db/schema.ts'
+import { epochs, holders, meta } from './db/schema.ts'
 import { createSolanaClient } from './solana-client.ts'
 import type { MintRecord, SignatureRecord } from './types.ts'
 
@@ -268,4 +268,9 @@ export async function syncLatest(db: Db): Promise<void> {
 
   // Always re-index current epoch (may have new mints) and any missing previous ones
   await indexAll(db, 731, currentEpoch)
+
+  await db
+    .insert(meta)
+    .values({ key: 'lastCheckedAt', value: new Date().toISOString() })
+    .onConflictDoUpdate({ set: { value: new Date().toISOString() }, target: meta.key })
 }

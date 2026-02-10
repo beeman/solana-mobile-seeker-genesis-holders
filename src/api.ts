@@ -1,20 +1,20 @@
 import { eq, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createDb } from './db/index.ts'
-import { epochs, holders } from './db/schema.ts'
+import { epochs, holders, meta } from './db/schema.ts'
 
 const db = createDb()
 const app = new Hono()
 
 app.get('/', async (c) => {
-  const [[countResult], epochData] = await Promise.all([
+  const [[countResult], epochData, [lastCheckedRow]] = await Promise.all([
     db.select({ total: sql<number>`count(*)` }).from(holders),
     db.select().from(epochs).orderBy(epochs.epoch),
+    db.select().from(meta).where(eq(meta.key, 'lastCheckedAt')),
   ])
   const totalHolders = countResult?.total ?? 0
 
-  const lastIndexed = epochData.reduce((latest, e) => (e.indexedAt > latest ? e.indexedAt : latest), '')
-  const lastUpdatedDate = lastIndexed ? new Date(lastIndexed) : null
+  const lastUpdatedDate = lastCheckedRow ? new Date(lastCheckedRow.value) : null
   const timeAgo = lastUpdatedDate
     ? (() => {
         const seconds = Math.floor((Date.now() - lastUpdatedDate.getTime()) / 1000)

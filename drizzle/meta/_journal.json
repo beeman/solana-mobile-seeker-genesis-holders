@@ -15,6 +15,13 @@
       "when": 1770636237923,
       "tag": "0001_slimy_snowbird",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1770723265851,
+      "tag": "0002_overrated_the_fury",
+      "breakpoints": true
     }
   ]
 }
