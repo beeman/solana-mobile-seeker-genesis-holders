@@ -4,12 +4,12 @@
     "@solana/kit": "^6.0.1",
     "@solana/kit-plugin-rpc": "^0.2.0",
     "drizzle-orm": "^0.45.1",
+    "drizzle-kit": "^0.31.9",
     "hono": "^4.11.9"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
-    "@types/bun": "latest",
-    "drizzle-kit": "^0.31.9"
+    "@types/bun": "latest"
   },
   "license": "MIT",
   "name": "solana-mobile-seeker-genesis-holders",
@@ -20,6 +20,7 @@
   },
   "scripts": {
     "check-types": "tsc -b --noEmit",
+    "db:migrate": "bunx drizzle-kit migrate",
     "dev": "bun run --hot src/api.ts",
     "docker:build": "docker build -t ghcr.io/beeman/solana-mobile-seeker-genesis-holders .",
     "docker:push": "docker push ghcr.io/beeman/solana-mobile-seeker-genesis-holders",
@@ -30,6 +31,7 @@
     "lint": "biome check --error-on-warnings",
     "lint:fix": "biome check --error-on-warnings --write",
     "serve": "bun run src/api.ts",
+    "start": "bun run db:migrate && bun run serve",
     "test": "bun test",
     "test:watch": "bun test --watch"
   },
