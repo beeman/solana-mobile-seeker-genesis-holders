@@ -13,6 +13,21 @@ app.get('/', async (c) => {
   ])
   const totalHolders = countResult?.total ?? 0
 
+  const lastIndexed = epochData.reduce((latest, e) => (e.indexedAt > latest ? e.indexedAt : latest), '')
+  const lastUpdatedDate = lastIndexed ? new Date(lastIndexed) : null
+  const timeAgo = lastUpdatedDate
+    ? (() => {
+        const seconds = Math.floor((Date.now() - lastUpdatedDate.getTime()) / 1000)
+        if (seconds < 60) return 'just now'
+        const minutes = Math.floor(seconds / 60)
+        if (minutes < 60) return `${minutes}m ago`
+        const hours = Math.floor(minutes / 60)
+        if (hours < 24) return `${hours}h ago`
+        const days = Math.floor(hours / 24)
+        return `${days}d ago`
+      })()
+    : null
+
   const chartEpochs = epochData.filter((e) => e.holderCount > 0)
   const chartLabels = chartEpochs.map((e) => {
     if (!e.firstBlockTime) return `Epoch ${e.epoch}`
@@ -77,7 +92,9 @@ app.get('/', async (c) => {
     .container { max-width: 640px; margin: 0 auto; }
     h1 { font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem; }
     .subtitle { color: #a1a1aa; margin-bottom: 2rem; }
-    .stat { display: inline-block; background: #18181b; border: 1px solid #27272a; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 2rem; }
+    .stats { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .stat { background: #18181b; border: 1px solid #27272a; border-radius: 0.5rem; padding: 0.75rem 1rem; }
+    .updated { color: #52525b; font-size: 0.75rem; margin-bottom: 2rem; }
     .stat-value { font-size: 1.25rem; font-weight: 600; color: #22d3ee; }
     .stat-label { font-size: 0.875rem; color: #a1a1aa; }
     h2 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem; margin-top: 1.5rem; }
@@ -100,10 +117,17 @@ app.get('/', async (c) => {
     <h1>Seeker Genesis Holders API</h1>
     <p class="subtitle">Tracks ownership of Solana Mobile Seeker Genesis NFTs on the Solana blockchain.</p>
 
-    <div class="stat">
-      <div class="stat-value">${totalHolders.toLocaleString()}</div>
-      <div class="stat-label">indexed holders</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">${totalHolders.toLocaleString()}</div>
+        <div class="stat-label">indexed holders</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">${epochData.length}</div>
+        <div class="stat-label">epochs indexed</div>
+      </div>
     </div>
+    ${timeAgo ? `<div class="updated">Last updated ${timeAgo}</div>` : ''}
 
     <h2>Endpoints</h2>
 
