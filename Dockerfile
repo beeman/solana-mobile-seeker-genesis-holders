@@ -6,6 +6,7 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --production
 
 FROM base
+COPY package.json ./
 COPY --from=install /app/node_modules node_modules
 COPY src src
 COPY drizzle drizzle
