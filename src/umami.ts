@@ -1,15 +1,8 @@
-import { Umami } from '@umami/node'
 import type { Context, Next } from 'hono'
 
 const UMAMI_HOST_URL = process.env.UMAMI_URL ?? 'https://stats.colmena.dev'
 const UMAMI_WEBSITE_ID = process.env.UMAMI_WEBSITE_ID ?? ''
-
-const client = UMAMI_WEBSITE_ID
-  ? new Umami({
-      hostUrl: UMAMI_HOST_URL,
-      websiteId: UMAMI_WEBSITE_ID,
-    })
-  : null
+const UMAMI_HOSTNAME = process.env.UMAMI_HOSTNAME ?? 'seeker-genesis.colmena.dev'
 
 const EVENT_ROUTES: [RegExp, string][] = [
   [/^\/api\/holders\/.+$/, 'api-holder-lookup'],
@@ -28,8 +21,25 @@ function resolveEventName(path: string): string {
   return 'api-request'
 }
 
+function getClientIp(c: Context): string {
+  return c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ?? c.req.header('x-real-ip') ?? ''
+}
+
+function sendToUmami(payload: Record<string, unknown>, headers: Record<string, string>) {
+  fetch(`${UMAMI_HOST_URL}/api/send`, {
+    body: JSON.stringify({ payload, type: 'event' }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    method: 'POST',
+  }).catch(() => {
+    // Silently ignore tracking failures
+  })
+}
+
 export async function umamiTracking(c: Context, next: Next) {
-  if (!client) {
+  if (!UMAMI_WEBSITE_ID) {
     return next()
   }
 
@@ -38,13 +48,14 @@ export async function umamiTracking(c: Context, next: Next) {
   const duration = Date.now() - start
 
   const url = c.req.path
+  const clientIp = getClientIp(c)
+  const userAgent = c.req.header('user-agent') ?? ''
 
-  // Fire and forget — don't block the response
   const data: Record<string, string | number> = {
     duration,
     method: c.req.method,
     status: c.res.status,
-    userAgent: c.req.header('user-agent') ?? '',
+    userAgent,
   }
 
   const wallet = c.req.param('wallet')
@@ -52,13 +63,22 @@ export async function umamiTracking(c: Context, next: Next) {
     data.wallet = wallet
   }
 
-  client
-    .track({
+  // Call Umami directly so we can forward client IP + user-agent for geo/device detection
+  const headers: Record<string, string> = {
+    'User-Agent': userAgent,
+  }
+  if (clientIp) {
+    headers['X-Forwarded-For'] = clientIp
+  }
+
+  sendToUmami(
+    {
       data,
+      hostname: UMAMI_HOSTNAME,
       name: resolveEventName(url),
       url,
-    })
-    .catch(() => {
-      // Silently ignore tracking failures
-    })
+      website: UMAMI_WEBSITE_ID,
+    },
+    headers,
+  )
 }
