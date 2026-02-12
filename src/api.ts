@@ -2,6 +2,7 @@ import { eq, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createDb } from './db/index.ts'
 import { epochs, holders, meta } from './db/schema.ts'
+import llmsTxt from './llms.txt'
 import { umamiTracking } from './umami.ts'
 
 const db = createDb()
@@ -18,6 +19,10 @@ if ('client' in db && 'sync' in db.client) {
 const app = new Hono()
 
 app.use('*', umamiTracking)
+
+app.get('/llms.txt', (c) => {
+  return c.text(llmsTxt)
+})
 
 app.get('/', async (c) => {
   const [[countResult], epochData, [lastCheckedRow]] = await Promise.all([
@@ -216,7 +221,7 @@ async function checkSeekerGenesisHolder(
     <img src="${chartUrl}" alt="Holders by epoch" style="width:100%;border-radius:0.5rem;" />
 
     <footer>
-      Created by <a href="https://github.com/beeman">beeman</a> and <a href="https://github.com/obrera">obrera</a> using Claude &mdash; <a href="https://github.com/beeman/solana-mobile-seeker-genesis-holders">GitHub</a>
+      Created by <a href="https://github.com/beeman">beeman</a> and <a href="https://github.com/obrera">obrera</a> using Claude &mdash; <a href="https://github.com/beeman/solana-mobile-seeker-genesis-holders">GitHub</a> &mdash; <a href="/llms.txt">llms.txt</a>
     </footer>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
