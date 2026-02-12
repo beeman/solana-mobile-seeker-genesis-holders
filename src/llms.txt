@@ -1,0 +1,163 @@
+# Seeker Genesis Holders API
+
+> API for checking ownership of Solana Mobile Seeker Genesis NFTs on the Solana blockchain.
+
+The Seeker Genesis NFT collection is immutable and non-transferable. Once a wallet holds one, it holds it forever. This API indexes that data from on-chain and serves it via a simple REST API.
+
+Base URL: https://seeker-genesis.colmena.dev
+
+## Endpoints
+
+### Check if a wallet is a holder
+
+GET /api/holders/:wallet
+
+Returns the holder's mint details, or 404 if the wallet does not hold a Seeker Genesis NFT.
+
+Response (200):
+```json
+{
+  "count": 1,
+  "holder": "4pNxsmr4zu1RPQ6VLJBtZsm7cqCQwE9q6VSL8wJ8rzFX",
+  "mints": [
+    {
+      "ata": "2UmMgeZUzvLbeZsNmuCdZ7wD57g6rFfYrFo37b7dV1mH",
+      "blockTime": 1738085008,
+      "epoch": 733,
+      "mint": "CUSWiFEeAaUbDMDfSkEgyVg3aj8QTf15CCHAh5acQmAC",
+      "signature": "3PN1vXGakR5TQz5Vwzc...",
+      "slot": "316960068"
+    }
+  ]
+}
+```
+
+Response (404):
+```json
+{ "error": "Wallet is not a holder" }
+```
+
+### List all holders (paginated)
+
+GET /api/holders?page=1&limit=20
+
+Query parameters:
+- page: page number (default: 1)
+- limit: items per page (default: 20, max: 100)
+
+Response:
+```json
+{
+  "data": [
+    {
+      "ata": "...",
+      "blockTime": 1738085008,
+      "epoch": 733,
+      "holder": "4pNxsmr4zu1RPQ6VLJBtZsm7cqCQwE9q6VSL8wJ8rzFX",
+      "mint": "CUSWiFEeAaUbDMDfSkEgyVg3aj8QTf15CCHAh5acQmAC",
+      "signature": "...",
+      "slot": "316960068"
+    }
+  ],
+  "page": 1,
+  "pageCount": 37412,
+  "total": 112236
+}
+```
+
+### List indexed epochs
+
+GET /api/epochs
+
+Returns all indexed epochs with holder counts.
+
+Response:
+```json
+{
+  "data": [
+    {
+      "epoch": 733,
+      "holderCount": 1,
+      "indexedAt": "2026-02-09T11:03:35.299Z"
+    }
+  ],
+  "totalHolders": 112236
+}
+```
+
+### Health check
+
+GET /health
+
+Response:
+```json
+{
+  "status": "ok",
+  "totalHolders": 112236,
+  "uptime": 3600
+}
+```
+
+## Token Gating with TypeScript
+
+Use this to check if a wallet holds a Seeker Genesis NFT in your TypeScript app:
+
+```typescript
+import { type Address, assertIsAddress } from "@solana/kit";
+
+const SEEKER_GENESIS_API = "https://seeker-genesis.colmena.dev";
+
+interface SeekerGenesisMint {
+  ata: string;
+  blockTime: number;
+  epoch: number;
+  mint: string;
+  signature: string;
+  slot: string;
+}
+
+type SeekerGenesisResult =
+  | { isHolder: true; mint: SeekerGenesisMint }
+  | { isHolder: false; mint: null };
+
+async function checkSeekerGenesisHolder(
+  address: Address | string,
+): Promise<SeekerGenesisResult> {
+  assertIsAddress(address);
+  const response = await fetch(
+    `${SEEKER_GENESIS_API}/api/holders/${address}`,
+  ).catch((error) => {
+    throw new Error(`Failed to connect to Seeker Genesis API: ${error}`);
+  });
+
+  if (response.status === 404) {
+    return { isHolder: false, mint: null };
+  }
+
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+
+  const { mints } = (await response.json()) as { mints: SeekerGenesisMint[] };
+
+  return mints[0]
+    ? { isHolder: true, mint: mints[0] }
+    : { isHolder: false, mint: null };
+}
+```
+
+### Usage example
+
+```typescript
+const result = await checkSeekerGenesisHolder("4pNxsmr4zu1RPQ6VLJBtZsm7cqCQwE9q6VSL8wJ8rzFX");
+
+if (result.isHolder) {
+  console.log(`Holder! Mint: ${result.mint.mint}`);
+} else {
+  console.log("Not a Seeker Genesis holder");
+}
+```
+
+## Source
+
+GitHub: https://github.com/beeman/solana-mobile-seeker-genesis-holders
