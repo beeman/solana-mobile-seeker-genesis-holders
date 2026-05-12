@@ -7,13 +7,22 @@ import type { MintRecord, SignatureRecord } from './types.ts'
 
 const PAYER = address('GT2zuHVaZQYZSyQMgJPLzvkmyztfyXg2NJunqFp4p3A4')
 const GROUP = 'GT22s89nU4iWFkNXj1Bw6uYhJJWDRPpShHt4Bk8f99Te'
-const SLOTS_PER_EPOCH = 432_000
+export const SLOTS_PER_EPOCH = 432_000
 const PAGE_DELAY_MS = 200
 const TX_DELAY_MS = 50
 const MAX_RETRIES = 3
 const RETRY_DELAY_MS = 1000
 
 type SolanaClient = ReturnType<typeof createSolanaClient>
+
+async function upsertMeta(db: Db, key: string, value: string): Promise<void> {
+  await db.insert(meta).values({ key, value }).onConflictDoUpdate({ set: { value }, target: meta.key })
+}
+
+async function getCurrentEpoch(client: SolanaClient): Promise<number> {
+  const slot = await client.rpc.getSlot().send()
+  return Math.floor(Number(slot) / SLOTS_PER_EPOCH)
+}
 
 function toSignatureRecord(tx: {
   blockTime: bigint | null
@@ -239,8 +248,7 @@ export async function indexEpoch(db: Db, epoch: number): Promise<{ holderCount: 
 
 export async function indexAll(db: Db, startEpoch = 731, endEpoch?: number): Promise<void> {
   const client = createSolanaClient()
-  const slot = await client.rpc.getSlot().send()
-  const currentEpoch = endEpoch ?? Math.floor(Number(slot) / SLOTS_PER_EPOCH)
+  const currentEpoch = endEpoch ?? (await getCurrentEpoch(client))
 
   console.log(`[index] Indexing epochs ${startEpoch} to ${currentEpoch}`)
 
@@ -263,14 +271,19 @@ export async function indexAll(db: Db, startEpoch = 731, endEpoch?: number): Pro
 
 export async function syncLatest(db: Db): Promise<void> {
   const client = createSolanaClient()
-  const slot = await client.rpc.getSlot().send()
-  const currentEpoch = Math.floor(Number(slot) / SLOTS_PER_EPOCH)
+  const currentEpoch = await getCurrentEpoch(client)
+  const missingCompletedEndEpoch = currentEpoch - 2
 
-  // Always re-index current epoch (may have new mints) and any missing previous ones
-  await indexAll(db, 731, currentEpoch)
+  if (missingCompletedEndEpoch >= 731) {
+    await indexAll(db, 731, missingCompletedEndEpoch)
+  }
 
-  await db
-    .insert(meta)
-    .values({ key: 'lastCheckedAt', value: new Date().toISOString() })
-    .onConflictDoUpdate({ set: { value: new Date().toISOString() }, target: meta.key })
+  const recentEpochs = new Set([Math.max(731, currentEpoch - 1), currentEpoch])
+  for (const epoch of recentEpochs) {
+    await indexEpoch(db, epoch)
+  }
+
+  const checkedAt = new Date().toISOString()
+  await upsertMeta(db, 'lastCheckedAt', checkedAt)
+  await upsertMeta(db, 'lastCheckedEpoch', currentEpoch.toString())
 }
