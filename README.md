@@ -1,5 +1,12 @@
 # Solana Mobile Seeker Genesis Holders
 
+## Deprecation
+
+> [!WARNING]
+> **Deprecation and shutdown are scheduled for September 1, 2026.** This project and its hosted API are not recommended for new integrations.
+
+API responses include the standard `Deprecation`, `Link`, and `Sunset` headers.
+
 Indexes and serves Solana Mobile Seeker Genesis NFT holder data. Tracks which wallets hold Seeker Genesis NFTs, which mint they hold, and since when.
 
 The NFT collection is immutable and non-transferable — once indexed, the data is final.

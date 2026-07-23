@@ -5,6 +5,10 @@ import { epochs, holders, meta } from './db/schema.ts'
 import llmsTxt from './llms.txt'
 import { umamiTracking } from './umami.ts'
 
+const DEPRECATION_DATE = '@1788220800'
+const DEPRECATION_DOCUMENTATION = 'https://github.com/beeman/solana-mobile-seeker-genesis-holders#deprecation'
+const SUNSET_DATE = 'Tue, 01 Sep 2026 00:00:00 GMT'
+
 const db = createDb()
 
 // Sync embedded replica on startup and periodically
@@ -17,6 +21,13 @@ if ('client' in db && 'sync' in db.client) {
 }
 
 const app = new Hono()
+
+app.use('*', async (c, next) => {
+  c.header('Deprecation', DEPRECATION_DATE)
+  c.header('Link', `<${DEPRECATION_DOCUMENTATION}>; rel="deprecation"; type="text/html"`)
+  c.header('Sunset', SUNSET_DATE)
+  await next()
+})
 
 app.use('*', umamiTracking)
 
@@ -108,6 +119,8 @@ app.get('/', async (c) => {
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, -apple-system, sans-serif; background: #0a0a0a; color: #e4e4e7; line-height: 1.6; padding: 2rem; }
     .container { max-width: 640px; margin: 0 auto; }
+    .deprecation { background: #1c1917; border: 1px solid #92400e; border-radius: 0.5rem; color: #fcd34d; margin-bottom: 1.5rem; padding: 0.75rem 1rem; }
+    .deprecation strong { color: #fef3c7; display: block; }
     h1 { font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem; }
     .subtitle { color: #a1a1aa; margin-bottom: 2rem; }
     .stats { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
@@ -132,6 +145,11 @@ app.get('/', async (c) => {
 </head>
 <body>
   <div class="container">
+    <aside class="deprecation" aria-label="Deprecation notice">
+      <strong>Deprecation and shutdown scheduled for September 1, 2026</strong>
+      This project and its hosted API are not recommended for new integrations.
+    </aside>
+
     <h1>Seeker Genesis Holders API</h1>
     <p class="subtitle">Tracks ownership of Solana Mobile Seeker Genesis NFTs on the Solana blockchain.</p>
 
