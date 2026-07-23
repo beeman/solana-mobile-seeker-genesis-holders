@@ -2,6 +2,12 @@
 
 > API for checking ownership of Solana Mobile Seeker Genesis NFTs on the Solana blockchain.
 
+## Deprecation
+
+Deprecation and shutdown are scheduled for September 1, 2026. This project and its hosted API are not recommended for new integrations.
+
+API responses include the standard `Deprecation`, `Link`, and `Sunset` headers.
+
 The Seeker Genesis NFT collection is immutable and non-transferable. Once a wallet holds one, it holds it forever. This API indexes that data from on-chain and serves it via a simple REST API.
 
 Base URL: https://seeker-genesis.colmena.dev
