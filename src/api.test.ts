@@ -3,7 +3,7 @@ import { eq, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/libsql'
 import { Hono } from 'hono'
 import * as schema from './db/schema.ts'
-import { epochs, holders } from './db/schema.ts'
+import { epochs, holders, meta } from './db/schema.ts'
 
 async function createTestApp() {
   const db = drizzle({ connection: { url: ':memory:' }, schema })
@@ -26,6 +26,10 @@ async function createTestApp() {
     holder_count INTEGER NOT NULL DEFAULT 0,
     indexed_at TEXT NOT NULL,
     last_block_time INTEGER
+  )`)
+  await db.run(sql`CREATE TABLE IF NOT EXISTS meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
   )`)
 
   const app = new Hono()
@@ -81,6 +85,28 @@ async function createTestApp() {
     })
   })
 
+  app.get('/health', async (c) => {
+    const [[countResult], epochData, [lastCheckedRow]] = await Promise.all([
+      db.select({ total: sql<number>`count(*)` }).from(holders),
+      db.select().from(epochs).orderBy(epochs.epoch),
+      db.select().from(meta).where(eq(meta.key, 'lastCheckedAt')),
+    ])
+    const latestIndexedEpoch = epochData.at(-1)?.epoch ?? null
+    const currentEpoch = 733
+    const lagEpochs = latestIndexedEpoch === null ? null : currentEpoch - latestIndexedEpoch
+
+    return c.json({
+      currentEpoch,
+      lagEpochs,
+      lastCheckedAt: lastCheckedRow?.value ?? null,
+      latestIndexedEpoch,
+      stale: lagEpochs === null || lagEpochs > 1,
+      status: lagEpochs === null || lagEpochs > 1 ? 'stale' : 'ok',
+      totalHolders: countResult?.total ?? 0,
+      uptime: Math.floor(process.uptime()),
+    })
+  })
+
   return { app, db }
 }
 
@@ -92,6 +118,7 @@ async function seedTestData(db: Awaited<ReturnType<typeof createTestApp>>['db'])
     sql`INSERT INTO holders (holder, mint, ata, epoch, slot, block_time, signature) VALUES ('wallet2', 'mint2', 'ata2', 731, '316960100', 1738085100, 'sig2')`,
   )
   await db.run(sql`INSERT INTO epochs (epoch, holder_count, indexed_at) VALUES (731, 2, '2026-02-09T00:00:00.000Z')`)
+  await db.run(sql`INSERT INTO meta (key, value) VALUES ('lastCheckedAt', '2026-02-09T01:00:00.000Z')`)
 }
 
 describe('GET /api/holders/:wallet', () => {
@@ -141,6 +168,33 @@ describe('GET /api/epochs', () => {
     const json = (await res.json()) as { data: Array<{ epoch: number }>; totalHolders: number }
     expect(json.data.length).toBe(1)
     expect(json.data[0]?.epoch).toBe(731)
+    expect(json.totalHolders).toBe(2)
+  })
+})
+
+describe('GET /health', () => {
+  test('returns index freshness data', async () => {
+    const { app, db } = await createTestApp()
+    await seedTestData(db)
+
+    const res = await app.request('/health')
+    expect(res.status).toBe(200)
+
+    const json = (await res.json()) as {
+      currentEpoch: number
+      lagEpochs: number
+      lastCheckedAt: string
+      latestIndexedEpoch: number
+      stale: boolean
+      status: string
+      totalHolders: number
+    }
+    expect(json.currentEpoch).toBe(733)
+    expect(json.latestIndexedEpoch).toBe(731)
+    expect(json.lagEpochs).toBe(2)
+    expect(json.lastCheckedAt).toBe('2026-02-09T01:00:00.000Z')
+    expect(json.stale).toBe(true)
+    expect(json.status).toBe('stale')
     expect(json.totalHolders).toBe(2)
   })
 })

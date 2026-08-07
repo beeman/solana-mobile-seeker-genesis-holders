@@ -98,11 +98,18 @@ GET /health
 Response:
 ```json
 {
+  "currentEpoch": 970,
+  "lagEpochs": 0,
+  "lastCheckedAt": "2026-05-12T11:40:00.000Z",
+  "latestIndexedEpoch": 970,
+  "stale": false,
   "status": "ok",
   "totalHolders": 112236,
   "uptime": 3600
 }
 ```
+
+The status changes to `stale` when the index has not checked in recently or when the latest indexed epoch is more than one epoch behind current Solana mainnet.
 
 ## Token Gating with TypeScript
 

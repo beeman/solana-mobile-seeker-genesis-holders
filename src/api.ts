@@ -2,7 +2,9 @@ import { eq, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createDb } from './db/index.ts'
 import { epochs, holders, meta } from './db/schema.ts'
+import { SLOTS_PER_EPOCH } from './indexer-db.ts'
 import llmsTxt from './llms.txt'
+import { createSolanaClient } from './solana-client.ts'
 import { umamiTracking } from './umami.ts'
 
 const DEPRECATION_DATE = '@1788220800'
@@ -10,6 +12,7 @@ const DEPRECATION_DOCUMENTATION = 'https://github.com/beeman/solana-mobile-seeke
 const SUNSET_DATE = 'Tue, 01 Sep 2026 00:00:00 GMT'
 
 const db = createDb()
+const STALE_AFTER_MS = 6 * 60 * 60 * 1000
 
 // Sync embedded replica on startup and periodically
 const SYNC_INTERVAL_MS = 60_000 // 1 minute
@@ -31,31 +34,69 @@ app.use('*', async (c, next) => {
 
 app.use('*', umamiTracking)
 
+async function getCurrentEpoch(): Promise<number | null> {
+  try {
+    const client = createSolanaClient()
+    const slot = await client.rpc.getSlot().send()
+    return Math.floor(Number(slot) / SLOTS_PER_EPOCH)
+  } catch (err) {
+    console.error('[health] Failed to fetch Solana slot:', err)
+    return null
+  }
+}
+
+function getTimeAgo(date: Date): string {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
+  if (seconds < 60) return 'just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return `${days}d ago`
+}
+
+async function getIndexStatus() {
+  const [[countResult], epochData, metaRows, currentEpoch] = await Promise.all([
+    db.select({ total: sql<number>`count(*)` }).from(holders),
+    db.select().from(epochs).orderBy(epochs.epoch),
+    db.select().from(meta),
+    getCurrentEpoch(),
+  ])
+
+  const metaByKey = new Map(metaRows.map((row) => [row.key, row.value]))
+  const lastCheckedAt = metaByKey.get('lastCheckedAt') ?? null
+  const lastCheckedDate = lastCheckedAt ? new Date(lastCheckedAt) : null
+  const latestIndexedEpoch = epochData.at(-1)?.epoch ?? null
+  const lagEpochs =
+    currentEpoch !== null && latestIndexedEpoch !== null ? Math.max(0, currentEpoch - latestIndexedEpoch) : null
+  const checkedAgeMs = lastCheckedDate ? Date.now() - lastCheckedDate.getTime() : null
+  const stale = checkedAgeMs === null || checkedAgeMs > STALE_AFTER_MS || (lagEpochs !== null && lagEpochs > 1)
+
+  return {
+    currentEpoch,
+    epochData,
+    lagEpochs,
+    lastCheckedAt,
+    latestIndexedEpoch,
+    stale,
+    totalHolders: countResult?.total ?? 0,
+  }
+}
+
 app.get('/llms.txt', (c) => {
   return c.text(llmsTxt)
 })
 
 app.get('/', async (c) => {
-  const [[countResult], epochData, [lastCheckedRow]] = await Promise.all([
-    db.select({ total: sql<number>`count(*)` }).from(holders),
-    db.select().from(epochs).orderBy(epochs.epoch),
-    db.select().from(meta).where(eq(meta.key, 'lastCheckedAt')),
-  ])
-  const totalHolders = countResult?.total ?? 0
+  const { currentEpoch, epochData, lagEpochs, lastCheckedAt, latestIndexedEpoch, stale, totalHolders } =
+    await getIndexStatus()
 
-  const lastUpdatedDate = lastCheckedRow ? new Date(lastCheckedRow.value) : null
-  const timeAgo = lastUpdatedDate
-    ? (() => {
-        const seconds = Math.floor((Date.now() - lastUpdatedDate.getTime()) / 1000)
-        if (seconds < 60) return 'just now'
-        const minutes = Math.floor(seconds / 60)
-        if (minutes < 60) return `${minutes}m ago`
-        const hours = Math.floor(minutes / 60)
-        if (hours < 24) return `${hours}h ago`
-        const days = Math.floor(hours / 24)
-        return `${days}d ago`
-      })()
-    : null
+  const lastUpdatedDate = lastCheckedAt ? new Date(lastCheckedAt) : null
+  const timeAgo = lastUpdatedDate ? getTimeAgo(lastUpdatedDate) : null
+  const freshnessLabel = timeAgo
+    ? `Last checked ${timeAgo}${lagEpochs !== null ? ` · ${lagEpochs} epoch${lagEpochs === 1 ? '' : 's'} behind` : ''}`
+    : 'Never checked'
 
   const chartEpochs = epochData.filter((e) => e.holderCount > 0)
   const chartLabels = chartEpochs.map((e) => {
@@ -126,6 +167,7 @@ app.get('/', async (c) => {
     .stats { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
     .stat { background: #18181b; border: 1px solid #27272a; border-radius: 0.5rem; padding: 0.75rem 1rem; }
     .updated { color: #52525b; font-size: 0.75rem; margin-bottom: 2rem; }
+    .updated.stale { color: #f87171; }
     .stat-value { font-size: 1.25rem; font-weight: 600; color: #22d3ee; }
     .stat-label { font-size: 0.875rem; color: #a1a1aa; }
     h2 { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem; margin-top: 1.5rem; }
@@ -163,7 +205,17 @@ app.get('/', async (c) => {
         <div class="stat-label">epochs indexed</div>
       </div>
     </div>
-    ${timeAgo ? `<div class="updated">Last updated ${timeAgo}</div>` : ''}
+    <div class="updated${stale ? ' stale' : ''}">${freshnessLabel}</div>
+    ${
+      stale
+        ? `<div class="endpoint">
+      <div><span class="method">STALE</span><span class="path">index freshness</span></div>
+      <div class="desc">Latest indexed epoch ${latestIndexedEpoch ?? 'unknown'}${
+        currentEpoch !== null ? `, current Solana epoch ${currentEpoch}` : ''
+      }. Scheduled indexing needs attention.</div>
+    </div>`
+        : ''
+    }
 
     <h2>Endpoints</h2>
 
@@ -252,11 +304,16 @@ async function checkSeekerGenesisHolder(
 })
 
 app.get('/health', async (c) => {
-  const [countResult] = await db.select({ total: sql<number>`count(*)` }).from(holders)
+  const { currentEpoch, lagEpochs, lastCheckedAt, latestIndexedEpoch, stale, totalHolders } = await getIndexStatus()
 
   return c.json({
-    status: 'ok',
-    totalHolders: countResult?.total ?? 0,
+    currentEpoch,
+    lagEpochs,
+    lastCheckedAt,
+    latestIndexedEpoch,
+    stale,
+    status: stale ? 'stale' : 'ok',
+    totalHolders,
     uptime: Math.floor(process.uptime()),
   })
 })
